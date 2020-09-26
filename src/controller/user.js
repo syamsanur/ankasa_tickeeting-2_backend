@@ -13,8 +13,8 @@ const user = {
         const generate = await bcrypt.hash(password, salt)
         userModel.register(data, generate)
             .then(() => {
-                success(res, [], 'please check your email')
-                const token = jwt.sign({ email: data.email }, env.SECRETKEY, { expiresIn: 1440 })
+                success(res, [], 'Please check your email to activation')
+                const token = jwt.sign({ email: data.email }, env.SECRETKEY)
                 const output = `
                 <center><h1>HELLO ${req.body.email}</h1>
                 <h3>Thank you for registration</h3>
@@ -49,14 +49,14 @@ const user = {
         const token = req.params.token
         jwt.verify(token, env.SECRETKEY, (err, decode) => {
             if (err) {
-                failed(res, [], err.message)
+                res.render('404')
             } else {
                 const data = jwt.decode(token)
                 const email = data.email
                 userModel.update(email).then((result) => {
                     res.render('index', { email })
                 }).catch(err => {
-                    failed(res, [], err.message)
+                    res.render('404')
                 })
             }
         })
