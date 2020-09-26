@@ -1,3 +1,4 @@
+const { promise } = require('../config/config')
 const db = require('../config/config')
 
 const user = {
@@ -23,6 +24,28 @@ const user = {
             })
          })
     },
+    login: (data) => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM user_reg WHERE email = ?`,data.email, (err, result) => {
+                if(err) {
+                    reject(err)
+                }else {
+                    resolve(result)
+                }
+            })
+        })
+    },
+    loginToken: (token,id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`UPDATE user_reg SET refreshToken='${token}' WHERE id_user=${id}`, (err, result) => {
+                if(err){
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+    }
 }
 
 module.exports = user

@@ -25,6 +25,27 @@ const response = {
             data: data
         }
         res.json(result)
+    },
+    failedLog: (res, data, message) => {
+        const result = {
+            code: 401,
+            status: false,
+            message: message,
+            data: data
+        }
+        res.json(result)
+    },
+    loginSuccess: (res, token, refreshToken, message) => {
+        const result = {
+            code: 200,
+            status: true,
+            message: message,
+            data: {
+                token,
+                refreshToken
+            }
+        }
+        res.json(result)
     }
 }
 

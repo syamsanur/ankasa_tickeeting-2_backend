@@ -1,4 +1,4 @@
-const { success, failed, failedReg } = require('../helper/res')
+const { success, failed, failedReg, failedLog, loginSuccess } = require('../helper/res')
 const bcrypt = require('bcrypt')
 const userModel = require('../model/users')
 const jwt = require("jsonwebtoken");
@@ -47,20 +47,52 @@ const user = {
     },
     verify: (req, res) => {
         const token = req.params.token
-        jwt.verify(token, env.SECRETKEY, { expiresIn: 1440 },(err, decode) => {
+        jwt.verify(token, env.SECRETKEY, (err, decode) => {
             if (err) {
-                failed(res, [], 'Failed Activation')
+                failed(res, [], err.message)
             } else {
                 const data = jwt.decode(token)
                 const email = data.email
                 userModel.update(email).then((result) => {
-                    res.render('index', {email})
+                    res.render('index', { email })
                 }).catch(err => {
-                    failed(res, [], 'Failed Activation')
+                    failed(res, [], err.message)
                 })
             }
         })
     },
+    login: (req, res) => {
+        const body = req.body
+        userModel.login(body)
+            .then(async (result) => {
+                if (!result[0]) {
+                    failedLog(res, [], "Email invalid")
+                } else {
+                    const data = result[0]
+                    const pass = data.password
+                    const password = req.body.password
+                    const isMatch = await bcrypt.compare(password, pass)
+                    if (!isMatch) {
+                        failedLog(res, [], "Password invalid")
+                    } else {
+                        const id = result[0].id_user
+                        const token_user = result[0].refreshToken
+                        const token = jwt.sign({id : id}, env.SECRETKEY, {expiresIn: 3600})
+                        const refresh = jwt.sign({id : id}, env.SECRETKEY)
+                        if(!token_user){
+                            userModel.loginToken(refresh, id)
+                                .then((result) => {
+                                    loginSuccess(res, token, refreshToken, 'success login')
+                                })
+                        }else {
+                            loginSuccess(res, token, token_user, 'success login')
+                        }
+                    }
+                }
+            }).catch((err) => {
+                console.log(err);
+            })
+    }
 }
 
 module.exports = user
