@@ -72,20 +72,24 @@ const user = {
                     const pass = data.password
                     const password = req.body.password
                     const isMatch = await bcrypt.compare(password, pass)
-                    if (!isMatch) {
-                        failedLog(res, [], "Password invalid")
-                    } else {
-                        const id = result[0].id_user
-                        const token_user = result[0].refreshToken
-                        const token = jwt.sign({id : id}, env.SECRETKEY, {expiresIn: 3600})
-                        const refresh = jwt.sign({id : id}, env.SECRETKEY)
-                        if(!token_user){
-                            userModel.loginToken(refresh, id)
-                                .then((result) => {
-                                    loginSuccess(res, id, token, refreshToken, 'success login')
-                                })
-                        }else {
-                            loginSuccess(res, id, token, token_user, 'success login')
+                    if(data.status === 0){
+                        failedLog(res, [], "Please check your email to activation")
+                    }else{ 
+                        if (!isMatch) {
+                            failedLog(res, [], "Password invalid")
+                        } else {
+                            const id = result[0].id_user
+                            const token_user = result[0].refreshToken
+                            const token = jwt.sign({id : id}, env.SECRETKEY, {expiresIn: 3600})
+                            const refresh = jwt.sign({id : id}, env.SECRETKEY)
+                            if(!token_user){
+                                userModel.loginToken(refresh, id)
+                                    .then((result) => {
+                                        loginSuccess(res, id, token, refreshToken, 'success login')
+                                    })
+                            }else {
+                                loginSuccess(res, id, token, token_user, 'success login')
+                            }
                         }
                     }
                 }
