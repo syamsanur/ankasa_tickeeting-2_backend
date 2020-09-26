@@ -82,10 +82,10 @@ const user = {
                         if(!token_user){
                             userModel.loginToken(refresh, id)
                                 .then((result) => {
-                                    loginSuccess(res, token, refreshToken, 'success login')
+                                    loginSuccess(res, id, token, refreshToken, 'success login')
                                 })
                         }else {
-                            loginSuccess(res, token, token_user, 'success login')
+                            loginSuccess(res, id, token, token_user, 'success login')
                         }
                     }
                 }
