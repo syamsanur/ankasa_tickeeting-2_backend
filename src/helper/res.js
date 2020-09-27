@@ -47,7 +47,18 @@ const response = {
             }
         }
         res.json(result)
-    }
+    },
+    successWithMeta: (res, data, meta, message) => {
+      const result = {
+          message,
+          success: true,
+          code: 200,
+          meta,
+          data,
+      };
+      res.status(200)
+      res.json(result);
+  }
 }
 
 module.exports = response
