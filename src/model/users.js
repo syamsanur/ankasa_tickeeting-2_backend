@@ -56,6 +56,28 @@ const user = {
                 }
             })
         })
+    },
+    updateUser: (data, id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`UPDATE users SET ? WHERE id_user = ${id}`,[data, id], (err, result) => {
+                if(err){
+                    reject(new Error(err))
+                }else {
+                    resolve(result)
+                }
+            })
+        })
+    },
+    deleteUser: (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`DELETE FROM users WHERE id_user=${id}`, (err,result) => {
+                if(err){
+                    reject(new Error(err))
+                }else {
+                    resolve(result)
+                }
+            })
+        })
     }
 }
 
