@@ -4,6 +4,7 @@ const userModel = require('../model/users')
 const jwt = require("jsonwebtoken");
 const env = require('../helper/env')
 const nodemailer = require('nodemailer')
+const uploadProfile = require('../helper/upload')
 
 const user = {
     register: async (req, res, next) => {
@@ -11,7 +12,8 @@ const user = {
         const password = req.body.password
         const salt = await bcrypt.genSalt(10)
         const generate = await bcrypt.hash(password, salt)
-        userModel.register(data, generate)
+        const img = "404P.png"
+        userModel.register(data, generate, img)
             .then(() => {
                 success(res, [], 'Please check your email to activation')
                 const token = jwt.sign({ email: data.email }, env.SECRETKEY)
@@ -72,30 +74,48 @@ const user = {
                     const pass = data.password
                     const password = req.body.password
                     const isMatch = await bcrypt.compare(password, pass)
-                    if(data.status === 0){
+                    if (data.status === 0) {
                         failedLog(res, [], "Please check your email to activation")
-                    }else{ 
+                    } else {
                         if (!isMatch) {
                             failedLog(res, [], "Password invalid")
                         } else {
                             const id = result[0].id_user
                             const token_user = result[0].refreshToken
-                            const token = jwt.sign({id : id}, env.SECRETKEY, {expiresIn: 3600})
-                            const refresh = jwt.sign({id : id}, env.SECRETKEY)
-                            if(!token_user){
+                            const token = jwt.sign({ id: id }, env.SECRETKEY, { expiresIn: 3600 })
+                            const refresh = jwt.sign({ id: id }, env.SECRETKEY)
+                            if (!token_user) {
                                 userModel.loginToken(refresh, id)
                                     .then((result) => {
                                         loginSuccess(res, id, token, refreshToken, 'success login')
                                     })
-                            }else {
+                            } else {
                                 loginSuccess(res, id, token, token_user, 'success login')
                             }
                         }
                     }
                 }
             }).catch((err) => {
-                console.log(err);
+                failed(res, [], err.message)
             })
+    },
+    updateUser: (req, res) => {
+        const id = req.params.id
+        const body = req.body.email
+        console.log(body);
+    },
+    getUser: (req, res) => {
+        try {
+            const id = req.params.id
+            userModel.getOne(id)
+                .then((result) => {
+                    success(res, result, 'success get user')
+                }).catch((err) => {
+                    failed(res, [], err.message)
+                })
+        } catch (err) {
+            failed(res, [], "Server internal error")
+        }
     }
 }
 

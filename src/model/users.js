@@ -2,9 +2,9 @@ const { promise } = require('../config/config')
 const db = require('../config/config')
 
 const user = {
-    register: (data, generate) => {
+    register: (data, generate, image) => {
         return new Promise((resolve, reject) => {
-            db.query(`INSERT INTO user_reg (fullname, email, password) VALUES('${data.fullname}', '${data.email}', '${generate}')`, (err, result) => {
+            db.query(`INSERT INTO users (fullname, email, password, image) VALUES('${data.fullname}', '${data.email}', '${generate}', '${image}')`, (err, result) => {
                 if(err){
                     reject(err)
                 }else {
@@ -15,7 +15,7 @@ const user = {
     },
     update: (email) => {
         return new Promise((resolve, reject) => {
-            db.query(`UPDATE user_reg SET status= 1 WHERE email='${email}'`, (err, result) => {
+            db.query(`UPDATE users SET status= 1 WHERE email='${email}'`, (err, result) => {
                if (err) {
                   reject(new Error(err))
                } else {
@@ -26,7 +26,7 @@ const user = {
     },
     login: (data) => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM user_reg WHERE email = ?`,data.email, (err, result) => {
+            db.query(`SELECT * FROM users WHERE email = ?`,data.email, (err, result) => {
                 if(err) {
                     reject(err)
                 }else {
@@ -41,6 +41,17 @@ const user = {
                 if(err){
                     reject(new Error(err))
                 }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
+    getOne: (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM users WHERE id_user=${id}`, (err, result) => {
+                if(err){
+                    reject(new Error(err))
+                }else {
                     resolve(result)
                 }
             })
