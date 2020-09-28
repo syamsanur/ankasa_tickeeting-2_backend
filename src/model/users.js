@@ -37,7 +37,7 @@ const user = {
     },
     loginToken: (token,id) => {
         return new Promise((resolve, reject) => {
-            db.query(`UPDATE user_reg SET refreshToken='${token}' WHERE id_user=${id}`, (err, result) => {
+            db.query(`UPDATE users SET refreshToken='${token}' WHERE id_user=${id}`, (err, result) => {
                 if(err){
                     reject(new Error(err))
                 }else{

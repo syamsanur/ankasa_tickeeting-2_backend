@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const db = require('./src/config/config')
 const users = require('./src/route/user')
 const airlines = require('./src/route/airlines')
+const booking = require('./src/route/booking')
 const path = require('path')
 const ejs = require('ejs')
 const cors = require('cors')
@@ -23,6 +24,7 @@ app.use(bodyParser.json())
 
 app.use('/user', users)
 app.use('/airlines', airlines)
+app.use('/booking', booking)
 
 
 app.listen(port,()=> {
