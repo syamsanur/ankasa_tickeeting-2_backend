@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const db = require('./src/config/config')
 const users = require('./src/route/user')
 const airlines = require('./src/route/airlines')
+const flight = require('./src/route/flight')
 const path = require('path')
 const ejs = require('ejs')
 const cors = require('cors')
@@ -23,7 +24,7 @@ app.use(bodyParser.json())
 
 app.use('/user', users)
 app.use('/airlines', airlines)
-
+app.use('/flight', flight)
 
 app.listen(port,()=> {
     console.log(`Server running at port ${port}`)
