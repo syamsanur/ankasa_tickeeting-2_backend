@@ -36,7 +36,7 @@ const user = {
                     });
 
                     let Mail = {
-                        from: '"maxmukiper.com" <maxmukiper.com>',
+                        from: '"Ankasa" <maxmukiper.com>',
                         to: req.body.email,
                         subject: "Verification Email",
                         text: "Plaintext version of the message",
@@ -209,6 +209,25 @@ const user = {
                         })
                     }
                 })
+        } catch (err) {
+            failed(res, [], "Server internal error")
+        }
+    },
+    refreshToken: (req, res) => {
+        try {
+            const token = req.body.refreshToken
+            const id = jwt.decode(token)
+            if (id === null) {
+                failed(res, [], "invalid refresh token")
+            } else {
+                jwt.sign({ id: id }, env.SECRETKEY, { expiresIn: 10800 }, (err, token) => {
+                    if (err) {
+                        failed(res, [], err.message)
+                    } else {
+                        success(res, { newToken: token }, 'success refresh token')
+                    }
+                })
+            }
         } catch (err) {
             failed(res, [], "Server internal error")
         }
