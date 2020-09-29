@@ -7,6 +7,7 @@ const users = require('./src/route/user')
 const airlines = require('./src/route/airlines')
 const flight = require('./src/route/flight')
 const booking = require('./src/route/booking')
+const country = require('./src/route/country')
 const path = require('path')
 const ejs = require('ejs')
 const cors = require('cors')
@@ -27,6 +28,7 @@ app.use('/user', users)
 app.use('/airlines', airlines)
 app.use('/flight', flight)
 app.use('/booking', booking)
+app.use('/country', country)
 
 
 app.listen(port,()=> {

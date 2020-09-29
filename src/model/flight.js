@@ -14,8 +14,8 @@ const flight = {
               resolve(result)
           }
       })
-  })
-},
+    })
+  },
   getToFromDate: (origin, destination, transit, type_flight, date, class_flight,
     luggage, meal, wifi, departurea, departureb, arriveda, arrivedb,pricea, priceb,
     limit,offset) => {
