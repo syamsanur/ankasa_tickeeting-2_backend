@@ -11,6 +11,7 @@ const country = require('./src/route/country')
 const path = require('path')
 const ejs = require('ejs')
 const cors = require('cors')
+const city = require('./src/route/city')
 
 db.connect((err) => {
     if(err) throw err
@@ -29,6 +30,7 @@ app.use('/airlines', airlines)
 app.use('/flight', flight)
 app.use('/booking', booking)
 app.use('/country', country)
+app.use('/city', city)
 
 
 app.listen(port,()=> {

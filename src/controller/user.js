@@ -1,11 +1,12 @@
-const { success, failed, failedReg, failedLog, loginSuccess } = require('../helper/res')
+const { success, failed, failedReg, failedLog, loginSuccess, successWithMeta } = require('../helper/res')
 const bcrypt = require('bcrypt')
 const userModel = require('../model/users')
 const jwt = require("jsonwebtoken");
 const env = require('../helper/env')
 const nodemailer = require('nodemailer')
 const upload = require('../helper/upload')
-const fs = require('fs')
+const fs = require('fs');
+const sendMail = require('../helper/Mail')
 
 const user = {
     register: async (req, res, next) => {
@@ -17,32 +18,10 @@ const user = {
             const img = "404P.png"
             userModel.register(data, generate, img)
                 .then(() => {
+                    const email = data.email
                     success(res, [], 'Please check your email to activation')
                     const token = jwt.sign({ email: data.email }, env.SECRETKEY)
-                    const output = `
-                <center><h1>HELLO ${req.body.email}</h1>
-                <h3>Thank you for registration</h3>
-                <p>You can confirm your email by clicking the link below <br> <a href="${env.HOSTURL}${token}">Activation</a></hp></center>
-                `
-                    let transporter = nodemailer.createTransport({
-                        host: 'smtp.gmail.com',
-                        port: 587,
-                        secure: false,
-                        requireTLS: true,
-                        auth: {
-                            user: env.USEREMAIL,
-                            pass: env.USERPASS
-                        }
-                    });
-
-                    let Mail = {
-                        from: '"Ankasa" <maxmukiper.com>',
-                        to: req.body.email,
-                        subject: "Verification Email",
-                        text: "Plaintext version of the message",
-                        html: output
-                    };
-                    transporter.sendMail(Mail)
+                    sendMail(email, token)
                 }).catch((err) => {
                     if (err.message = 'Duplicate entry') {
                         failedReg(res, [], 'User Already Exist')
@@ -97,7 +76,7 @@ const user = {
                                 if (!token_user) {
                                     userModel.loginToken(refresh, id)
                                         .then((result) => {
-                                            loginSuccess(res, id, token, refreshToken, 'success login')
+                                            loginSuccess(res, id, token, refresh, 'success login')
                                         })
                                 } else {
                                     loginSuccess(res, id, token, token_user, 'success login')
@@ -227,6 +206,102 @@ const user = {
                         success(res, { newToken: token }, 'success refresh token')
                     }
                 })
+            }
+        } catch (err) {
+            failed(res, [], "Server internal error")
+        }
+    },
+    getAll: (req, res) => {
+        try {
+            const name = !req.query.name ? "" : req.query.name;
+            const sort = !req.query.sort ? "id_user" : req.query.sort;
+            const typesort = !req.query.typesort ? "ASC" : req.query.typesort;
+            const limit = !req.query.limit ? 10 : parseInt(req.query.limit);
+            const page = !req.query.page ? 1 : parseInt(req.query.page);
+            const offset = page <= 1 ? 0 : (page - 1) * limit;
+            userModel.getAll(name, sort, typesort, limit, offset)
+                .then((result) => {
+                    const totalRows = result[0].count;
+                    const meta = {
+                        total: totalRows,
+                        totalPage: Math.ceil(totalRows / limit),
+                        page: page,
+                    }
+                    successWithMeta(res, result, meta, "Get all data success");
+                })
+                .catch((err) => {
+                    failed(res, [], err.message);
+                })
+        } catch (error) {
+            failed(res, [], "Server internal error")
+        }
+    },
+    resetPass: (req, res) => {
+        try {
+            const email = req.body.email
+            userModel.searchEmail(email)
+                .then((result) => {
+                    if (!result[0]) {
+                        failed(res, [], 'Email invalid')
+                    } else {
+                        const key = Math.floor(Math.random(111999777) * Math.floor(222999777))
+                        userModel.updateKey(key, email)
+                            .then((result) => {
+                                success(res, result, 'Check your email to reset password')
+                                const output = `
+                <h4>Reset Password</h4>
+                <p>You can confirm your email by clicking the link below <br> <a href="http://localhost:8080/reset-pwd?key=${key}">Reset Password</a></hp></center>
+                `
+                                let transporter = nodemailer.createTransport({
+                                    host: 'smtp.gmail.com',
+                                    port: 587,
+                                    secure: false,
+                                    requireTLS: true,
+                                    auth: {
+                                        user: env.USEREMAIL,
+                                        pass: env.USERPASS
+                                    }
+                                });
+
+                                let Mail = {
+                                    from: '"Ankasa" <maxmukiper.com>',
+                                    to: req.body.email,
+                                    subject: "Reset Password",
+                                    text: "Plaintext version of the message",
+                                    html: output
+                                };
+                                transporter.sendMail(Mail)
+                            }).catch((err) => {
+                                failed(res, [], err.message)
+                            })
+                    }
+                }).catch((err) => {
+                    failed(res, [], err.message)
+                })
+        } catch (err) {
+            failed(res, [], "Server internal error")
+        }
+    },
+    confirmPass: async (req, res) => {
+        try {
+            const data = req.body
+            const key = req.body.key
+            if (data.password !== data.confirmpwd) {
+                failed(res, [], "Your password and confirmation password do not match")
+            } else {
+                if (!key) {
+                    failed(res, [], "Key not found")
+                } else {
+                    const pass = data.password
+                    const salt = await bcrypt.genSalt(1)
+                    const generate = await bcrypt.hash(pass, salt)
+                    userModel.setPass(generate, key)
+                        .then((result) => {
+                            success(res, result, 'success reset password')
+                        }).catch((err) => {
+                            failed(res, [], err.message)
+                        })
+                }
             }
         } catch (err) {
             failed(res, [], "Server internal error")

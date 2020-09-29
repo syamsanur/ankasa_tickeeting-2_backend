@@ -49,16 +49,43 @@ const response = {
         res.json(result)
     },
     successWithMeta: (res, data, meta, message) => {
-      const result = {
-          message,
-          success: true,
-          code: 200,
-          meta,
-          data,
-      };
-      res.status(200)
-      res.json(result);
-  }
+        const result = {
+            message,
+            success: true,
+            code: 200,
+            meta,
+            data,
+        };
+        res.status(200)
+        res.json(result);
+    },
+    tokenExpired: (res, data, message) => {
+        const result = {
+            code: 403,
+            status: false,
+            message: message,
+            data: data
+        }
+        res.json(result)
+    },
+    tokenError: (res, data, message) => {
+        const result = {
+            code: 405,
+            status: false,
+            message: message,
+            data: data
+        }
+        res.json(result)
+    },
+    admErrToken: (res, data, message) => {
+        const result = {
+            code: 406,
+            status: false,
+            message: message,
+            data: data
+        }
+        res.json(result)
+    }
 }
 
 module.exports = response
