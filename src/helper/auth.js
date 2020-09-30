@@ -1,43 +1,45 @@
 const jwt = require('jsonwebtoken')
-const { tokenExpired, tokenError } = require('../helpers/res')
-const { PRIVATEKEY } = require('../helpers/env')
+const { tokenExpired, tokenError, admErrToken } = require('../helper/res')
+const { SECRETKEY } = require('../helper/env')
 
-module.exports = {
+const authku = {
     authentication: (req, res, next) => {
         const token = req.headers.token
-        if(token === undefined || token === '') {
-            tokenError(res, [], 'Token harus diisi')
+        if (token === undefined || token === '') {
+            tokenError(res, [], 'Token required')
         } else {
             next()
         }
     },
     authorization: (req, res, next) => {
         const token = req.headers.token
-        jwt.verify(token, PRIVATEKEY, (err) => {
+        jwt.verify(token, SECRETKEY, (err) => {
             if (err && err.name === 'TokenExpiredError') {
-                tokenExpired(res, [], 'Autentikasi gagal, token expired')
+                tokenExpired(res, [], 'Token expired')
             } else if (err && err.name === 'JsonWebTokenError') {
-                tokenError(res, [], 'Autentikasi gagal, token salah')
+                tokenError(res, [], 'Token invalid')
             } else {
                 next()
             }
         })
     },
-    // admin: (req, res, next) => {
-    //     const token = req.headers.token
-    //     jwt.verify(token, PRIVATEKEY, (err, decode) => {
-    //       if (err && err.name === 'JsonWebTokenError') {
-    //         admErrToken(res, [], "Authentification failed !");
-    //       } else if (err && err.name === 'TokenExpiredError') {
-    //         admErrToken(res, [], "Token Expired !");
-    //       }
-    //       else {
-    //         if (decode.dataUser.role === 1) {
-    //           next()
-    //         } else {
-    //           forbidden(res, 'Dont have permission!')
-    //         }
-    //       }
-    //     })
-    // }
+    admin: (req, res, next) => {
+        const token = req.headers.token
+        jwt.verify(token, SECRETKEY, (err, decode) => {
+            if (err && err.name === 'JsonWebTokenError') {
+                tokenError(res, [], "Authentification failed !");
+            } else if (err && err.name === 'TokenExpiredError') {
+                tokenError(res, [], "Token Expired !");
+            }
+            else {
+                if (decode.level === 1) {
+                    next()
+                } else {
+                    forbidden(res, 'Dont have permission!')
+                }
+            }
+        })
+    }
 }
+
+module.exports = authku

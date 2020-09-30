@@ -7,7 +7,8 @@ const env = {
     SECRETKEY: process.env.SECRET,
     USEREMAIL: process.env.USEREMAIL,
     USERPASS: process.env.USERPASS,
-    HOSTURL: process.env.HOSTURL
+    HOSTURL: process.env.HOSTURL,
+    PORT: process.env.PORT
 }
 
 module.exports = env

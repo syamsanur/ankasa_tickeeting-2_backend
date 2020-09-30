@@ -70,8 +70,9 @@ const user = {
                                 failedLog(res, [], "Password invalid")
                             } else {
                                 const id = result[0].id_user
+                                const level = result[0].level
                                 const token_user = result[0].refreshToken
-                                const token = jwt.sign({ id: id }, env.SECRETKEY, { expiresIn: 3600 })
+                                const token = jwt.sign({ id: id, level: level }, env.SECRETKEY, { expiresIn: 3600 })
                                 const refresh = jwt.sign({ id: id }, env.SECRETKEY)
                                 if (!token_user) {
                                     userModel.loginToken(refresh, id)
