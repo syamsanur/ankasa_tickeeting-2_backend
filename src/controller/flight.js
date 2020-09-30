@@ -34,28 +34,23 @@ const flight = {
       // console.log("get")
       const origin = req.query.origin
       const destination = req.query.destination
-      const transit = !req.query.transit ? 0 : req.query.transit
-      const type_flight = !req.query.type_flight ? 0 : req.query.type_flight
       const date = req.query.date
-      const class_flight = !req.query.class_flight ? 0 : req.query.class_flight
+      const class_flight = req.query.class_flight
+      const type_flight = 0
+
       const luggage = !req.query.luggage ? 0 : 1
       const meal = !req.query.meal ? 0 : 1
       const wifi = !req.query.wifi ? 0 : 1
-      const departurea = !req.querydeparturea ? '00:00:00' : req.query.departurea
-      const departureb = !req.query.departureb ? '24:00:00' : req.query.departureb
-      const arriveda = !req.query.arriveda ? '00:00:00' : req.query.arriveda
-      const arrivedb = !req.query.arrivedb ? '24:00:00' : req.query.arrivedb
-      const pricea = !req.query.pricea ? '000000' : req.query.pricea
-      const priceb = !req.query.priceb ? '1000000' : req.query.priceb
+      const airlines = !req.query.airlines ? 0 : req.query.airlines
       
       const limit = !req.query.limit ? 10 : parseInt(req.query.limit);
       const page = !req.query.page ? 1 : parseInt(req.query.page);
       const offset = page <= 1 ? 0 : (page - 1) * limit;
 
       flightModel.getToFromDate(
-        origin, destination, transit, type_flight, date, class_flight,
-        luggage, meal, wifi, departurea, departureb, arriveda, arrivedb,
-        pricea, priceb,
+        origin, destination, type_flight, date, class_flight,
+        luggage, meal, wifi,
+        airlines,
         limit,offset)
       .then((result) => {
         const totalRows = result.length;

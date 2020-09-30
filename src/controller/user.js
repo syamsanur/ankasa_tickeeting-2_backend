@@ -294,7 +294,7 @@ const user = {
                     failed(res, [], "Key not found")
                 } else {
                     const pass = data.password
-                    const salt = await bcrypt.genSalt(1)
+                    const salt = await bcrypt.genSalt(10)
                     const generate = await bcrypt.hash(pass, salt)
                     userModel.setPass(generate, key)
                         .then((result) => {
