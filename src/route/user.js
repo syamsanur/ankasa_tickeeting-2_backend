@@ -11,7 +11,7 @@ route.get('/verification/:token', verify)
 route.post('/reset-pass', resetPass)
 route.post('/reset-confirm', confirmPass)
 
-route.patch('/edit/:id',authentication, authorization, upload.single("image"), updateUser)
+route.patch('/edit/:id',authentication, authorization, updateUser)
 route.get('/getOne/:id',authentication, authorization, getUser)
 route.delete('/delete/:id',authentication, authorization ,deleteUser)
 route.post('/refresh',authentication, authorization ,refreshToken)

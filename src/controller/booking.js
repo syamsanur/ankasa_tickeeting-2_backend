@@ -80,7 +80,20 @@ const booking = {
         } catch (error) {
             failed(res, [], "Server internal error")
         }
-    }
+    },
+    getUserBooking: (req, res) => {
+      try {
+          const id = req.params.id
+          bookingModels.getDetail(id)
+              .then((result) => {
+                  success(res, result, `success get booking from user ${id}`)
+              }).catch((err) => {
+                  failed(res, [], err.message)
+              })
+      } catch (error) {
+          failed(res, [], "Server internal error")
+      }
+  }
 }
 
 module.exports = booking

@@ -14,7 +14,7 @@ const booking = {
     },
     getAll: (name, sort, typesort, limit, offset) => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT *, (SELECT COUNT (*) FROM booking) AS count FROM booking WHERE fullname LIKE 
+            db.query(`SELECT *, (SELECT COUNT (*) FROM booking) AS count FROM v_booking WHERE fullname LIKE 
             '%${name}%' ORDER BY ${sort} ${typesort} LIMIT ${offset},${limit}`, (err, result) => {
                 if(err) {
                     reject(new Error(err))
@@ -26,7 +26,7 @@ const booking = {
     },
     getDetail: (id) => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM booking`, (err, result) => {
+            db.query(`SELECT * FROM v_booking WHERE booking_id = ${id}`, (err, result) => {
                 if(err){
                     reject(new Error(err))
                 }else {
@@ -52,6 +52,17 @@ const booking = {
                 if(err){
                     reject(new Error(err))
                 }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
+    getUserFlight: (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM v_booking WHERE users_id = ${id}`, (err, result) => {
+                if(err){
+                    reject(new Error(err))
+                }else {
                     resolve(result)
                 }
             })
