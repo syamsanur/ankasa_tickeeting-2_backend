@@ -84,7 +84,7 @@ const booking = {
     getUserBooking: (req, res) => {
       try {
           const id = req.params.id
-          bookingModels.getDetail(id)
+          bookingModels.getUserFlight(id)
               .then((result) => {
                   success(res, result, `success get booking from user ${id}`)
               }).catch((err) => {
